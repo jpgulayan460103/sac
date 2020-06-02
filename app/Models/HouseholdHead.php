@@ -6,7 +6,7 @@ class HouseholdHead extends Model
 {
     protected $table         = 'household_heads';
     protected $primaryKey    = 'id';
-    protected $returnType    = 'array';
+    protected $returnType    = 'object';
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';

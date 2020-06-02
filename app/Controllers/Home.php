@@ -18,7 +18,7 @@ class Home extends BaseController
 		return view('form_test');
 	}
 
-	public function create()
+	public function createBeneficiary()
 	{
 		$rules = [
             'first_name' => 'required|disallow_dash|allowed_string_name|min_length[2]|max_length[100]',
@@ -151,6 +151,27 @@ class Home extends BaseController
 		$this->db->transComplete();
 		$household_head = new HouseholdHead();
 		return $this->respondCreated($household_head->find($household_id));
+	}
+
+	public function listBeneficiaries()
+	{
+		$sac_number = $this->request->uri->getSegment(3);
+		if($sac_number == null){
+			$sac_number = $this->request->getVar('sac_number');
+		}
+		if($sac_number == null){
+			return $this->fail("No records found.", 404);
+		}
+		$household_head_model = new HouseholdHead();
+		$household_head_query = $household_head_model->where('sac_number',$sac_number);
+		$household_head = $household_head_query->get()->getRow();
+
+		$household_members_model = new HouseholdMember();
+		$household_members_query = $household_members_model->where('household_head_id',$household_head->id);
+		$household_members = $household_members_query->get()->getResult();
+		$household_head->members = $household_members;
+		
+		return $this->respond($household_head);
 	}
 	
 	public function listBarangays()

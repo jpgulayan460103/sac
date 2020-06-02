@@ -6,7 +6,7 @@ class HouseholdMember extends Model
 {
     protected $table         = 'household_members';
     protected $primaryKey    = 'id';
-    protected $returnType    = 'array';
+    protected $returnType    = 'object';
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';

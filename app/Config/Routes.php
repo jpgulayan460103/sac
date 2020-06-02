@@ -31,7 +31,9 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
-$routes->post('/create', 'Home::create');
+$routes->post('/create', 'Home::createBeneficiary');
+$routes->get('/beneficiaries/encoded/(:segment)', 'Home::listBeneficiaries');
+$routes->post('/beneficiaries/encoded', 'Home::listBeneficiaries');
 $routes->get('/provinces', 'Home::listProvinces');
 $routes->get('/provinces/(:segment)/cities', 'Home::listCities');
 $routes->get('/provinces/(:segment)/cities/(:segment)/barangays', 'Home::listBarangays');
