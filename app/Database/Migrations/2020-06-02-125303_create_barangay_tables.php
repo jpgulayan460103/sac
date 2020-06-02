@@ -2,7 +2,7 @@
 
 use CodeIgniter\Database\Migration;
 
-class HouseholdMembers extends Migration
+class CreateBarangayTables extends Migration
 {
 	public function up()
 	{
@@ -13,64 +13,45 @@ class HouseholdMembers extends Migration
 				'unsigned'       => TRUE,
 				'auto_increment' => TRUE,
 			],
-			'household_head_id' => [
-				'type'           => 'INT',
-				'constraint'     => 11,
-				'unsigned'       => TRUE,
-			],
-			'first_name' => [
-				'type'           => 'VARCHAR',
-				'constraint'     => 100,
-				'null'           => TRUE,
-			],
-			'middle_name' => [
-				'type'           => 'VARCHAR',
-				'constraint'     => 100,
-				'null'           => TRUE,
-			],
-			'last_name' => [
-				'type'           => 'VARCHAR',
-				'constraint'     => 100,
-				'null'           => TRUE,
-			],
-			'ext_name' => [
-				'type'           => 'VARCHAR',
-				'constraint'     => 100,
-				'null'           => TRUE,
-			],
-			'relasyon_sa_punong_pamilya' => [
-				'type'           => 'VARCHAR',
-				'constraint'     => 100,
-				'null'           => TRUE,
-			],
-			'kasarian' => [
-				'type'           => 'VARCHAR',
-				'constraint'     => 100,
-			],
-			'kapanganakan' => [
-				'type'           => 'DATE',
-				'null'           => TRUE,
-			],
-			'trabaho' => [
+			'barangay_name' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 200,
 				'null'           => TRUE,
-				'default'        => '-',
 			],
-			'pinagtratrabahuhang_lugar' => [
+			'barangay_psgc' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 200,
-				'default'        => '-',
+				'null'           => TRUE,
 			],
-			'sektor' => [
+			'province_name' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 200,
-				'default'        => 'W - Wala sa pagpipilian',
+				'null'           => TRUE,
 			],
-			'kondisyon_ng_kalusugan' => [
+			'province_psgc' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 200,
-				'default'        => '0 - Wala sa pagpipilian',
+				'null'           => TRUE,
+			],
+			'city_name' => [
+				'type'           => 'VARCHAR',
+				'constraint'     => 200,
+				'null'           => TRUE,
+			],
+			'city_psgc' => [
+				'type'           => 'VARCHAR',
+				'constraint'     => 200,
+				'null'           => TRUE,
+			],
+			'district' => [
+				'type'           => 'VARCHAR',
+				'constraint'     => 200,
+				'null'           => TRUE,
+			],
+			'subdistrict' => [
+				'type'           => 'VARCHAR',
+				'constraint'     => 200,
+				'null'           => TRUE,
 			],
 			'created_at' => [
 				'type'           => 'TIMESTAMP',
@@ -82,14 +63,13 @@ class HouseholdMembers extends Migration
 			],
 		]);
 		$this->forge->addKey('id', TRUE);
-		$this->forge->addForeignKey('household_head_id','household_heads','id','CASCADE','CASCADE');
-		$this->forge->createTable('household_members');
+		$this->forge->createTable('barangays');
 	}
 
 	//--------------------------------------------------------------------
 
 	public function down()
 	{
-		$this->forge->dropTable('household_members');
+		$this->forge->dropTable('barangays');
 	}
 }

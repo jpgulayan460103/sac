@@ -12,7 +12,7 @@ class HouseholdHead extends Model
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
     protected $allowedFields = [
-        'barangay_id',
+        'barangay_psgc',
         'first_name',
         'middle_name',
         'last_name',

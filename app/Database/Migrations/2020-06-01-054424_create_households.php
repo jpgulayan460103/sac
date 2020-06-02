@@ -13,11 +13,10 @@ class CreateHouseholds extends Migration
 				'unsigned'       => TRUE,
 				'auto_increment' => TRUE,
 			],
-			'barangay_id' => [
-				'type'           => 'INT',
-				'constraint'     => 11,
-				'unsigned'       => TRUE,
-				'null'           => true,
+			'barangay_psgc' => [
+				'type'           => 'VARCHAR',
+				'constraint'     => 100,
+				'null'           => TRUE,
 			],
 			'first_name' => [
 				'type'           => 'VARCHAR',
@@ -155,6 +154,7 @@ class CreateHouseholds extends Migration
 			],
 		]);
 		$this->forge->addKey('id', TRUE);
+		$this->forge->addKey('barangay_psgc');
 		$this->forge->createTable('household_heads');
 	}
 
@@ -162,6 +162,6 @@ class CreateHouseholds extends Migration
 
 	public function down()
 	{
-		//
+		$this->forge->dropTable('household_heads');
 	}
 }

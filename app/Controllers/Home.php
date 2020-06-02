@@ -3,6 +3,7 @@
 use CodeIgniter\API\ResponseTrait;
 use App\Models\HouseholdHead;
 use App\Models\HouseholdMember;
+use App\Models\Barangay;
 
 class Home extends BaseController
 {
@@ -151,6 +152,55 @@ class Home extends BaseController
 		$household_head = new HouseholdHead();
 		return $this->respondCreated($household_head->find($household_id));
 	}
-	//--------------------------------------------------------------------
+	
+	public function listBarangays()
+	{
+		$city_psgc = $this->request->uri->getSegment(4);
+		$barangays = new Barangay();
+		$barangay_query = $barangays->distinct();
+		$barangay_query->select('barangay_name,barangay_psgc');
+		$barangay_query->where('city_psgc', $city_psgc);
+		$data = [
+			'barangays' => $barangay_query->get()->getResult(),
+		];
+		return $this->respond($data, 200);
+	}
+
+	public function listProvinces()
+	{
+		$barangays = new Barangay();
+		$barangays->distinct();
+		$barangays->select('province_name,province_psgc');
+		$data = [
+			'provinces' => $barangays->get()->getResult(),
+		];
+		return $this->respond($data, 200);
+	}
+
+	public function listCities()
+	{
+		$province_psgc = $this->request->uri->getSegment(2);
+		$barangays = new Barangay();
+		$barangay_query = $barangays->distinct();
+		$barangay_query->select('city_name,city_psgc');
+		$barangay_query->where('province_psgc', $province_psgc);
+		$data = [
+			'cities' => $barangay_query->get()->getResult(),
+		];
+		return $this->respond($data, 200);
+	}
+
+	/* 
+	Auth Code
+	$hashed = password_hash('rasmuslerdorf', PASSWORD_DEFAULT);
+	echo  $hashed;
+	if (password_verify('rasmuslerdorf', $hashed)) {
+		echo 'Password is valid!';
+	} else {
+		echo 'Invalid password.';
+	}
+	
+	*/
+	
 
 }

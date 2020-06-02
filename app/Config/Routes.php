@@ -32,6 +32,9 @@ $routes->setAutoRoute(true);
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 $routes->post('/create', 'Home::create');
+$routes->get('/provinces', 'Home::listProvinces');
+$routes->get('/provinces/(:segment)/cities', 'Home::listCities');
+$routes->get('/provinces/(:segment)/cities/(:segment)/barangays', 'Home::listBarangays');
 
 /**
  * --------------------------------------------------------------------
