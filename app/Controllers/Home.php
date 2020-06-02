@@ -2,10 +2,15 @@
 
 use CodeIgniter\API\ResponseTrait;
 use App\Models\HouseholdHead;
+use App\Models\HouseholdMember;
 
 class Home extends BaseController
 {
 	use ResponseTrait;
+	private $db;
+	function __construct() {
+		$this->db = \Config\Database::connect();
+	}
 	
 	public function index()
 	{
@@ -39,7 +44,7 @@ class Home extends BaseController
             'petsa_ng_pagrehistro' => 'required|valid_birthdate',
             'pangalan_ng_punong_barangay' => 'required|disallow_dash|allowed_string_name|max_length[200]',
             'pangalan_ng_lswdo' => 'required|disallow_dash|allowed_string_name|max_length[200]',
-            'sac_number' => 'required|numeric|max_length[8]|is_unique[household_heads.sac_number]',
+            'sac_number' => 'required|numeric|is_unique[household_heads.sac_number]|max_length[6]',
 		];
 		if($this->request->getVar('cellphone_number')){
 			$rules['cellphone_number'] = 'exact_length[11]';
@@ -65,28 +70,30 @@ class Home extends BaseController
 			],
 		];
 		
-		$members = $this->request->getVar('members');
-		foreach ($members as $key => $member) {
-			$rules["members.$key.first_name"] = 'required|disallow_dash|allowed_string_name|max_length[100]';
-			$rules["members.$key.middle_name"] = 'disallow_dash|allowed_string_name|max_length[100]';
-			$rules["members.$key.last_name"] = 'required|disallow_dash|allowed_string_name|max_length[100]';
-			$rules["members.$key.ext_name"] = 'disallow_dash|allowed_string_name|max_length[100]';
-			$rules["members.$key.relasyon_sa_punong_pamilya"] = "required|valid_relasyon_age[$key]|allowed_string|max_length[100]";
-			$rules["members.$key.kasarian"] = 'required|max_length[1]';
-			$rules["members.$key.kapanganakan"] = 'required|valid_birthdate';
-			$rules["members.$key.trabaho"] = 'required|allowed_string|max_length[200]';
-			$rules["members.$key.pinagtratrabahuhang_lugar"] = 'allowed_string|max_length[200]';
-			$rules["members.$key.sektor"] = "required|valid_nakakatanda[$key]|valid_ina[$key]|valid_ina_age[$key]|allowed_string|max_length[200]";
-			$rules["members.$key.kondisyon_ng_kalusugan"] = 'required|allowed_string|max_length[200]';
+		if($this->request->getVar('members')){
+			$members = $this->request->getVar('members');
+			foreach ($members as $key => $member) {
+				$rules["members.$key.first_name"] = 'required|disallow_dash|allowed_string_name|max_length[100]';
+				$rules["members.$key.middle_name"] = 'disallow_dash|allowed_string_name|max_length[100]';
+				$rules["members.$key.last_name"] = 'required|disallow_dash|allowed_string_name|max_length[100]';
+				$rules["members.$key.ext_name"] = 'disallow_dash|allowed_string_name|max_length[100]';
+				$rules["members.$key.relasyon_sa_punong_pamilya"] = "required|valid_relasyon_age[$key]|allowed_string|max_length[100]";
+				$rules["members.$key.kasarian"] = 'required|max_length[1]';
+				$rules["members.$key.kapanganakan"] = 'required|valid_birthdate';
+				$rules["members.$key.trabaho"] = 'required|allowed_string|max_length[200]';
+				$rules["members.$key.pinagtratrabahuhang_lugar"] = 'allowed_string|max_length[200]';
+				$rules["members.$key.sektor"] = "required|valid_nakakatanda[$key]|valid_ina[$key]|valid_ina_age[$key]|allowed_string|max_length[200]";
+				$rules["members.$key.kondisyon_ng_kalusugan"] = 'required|allowed_string|max_length[200]';
+			}
 		}
+		
 		$this->validate($rules,$error_messages);
-
-		// $rules = [
-
-        //     'kapanganakan' => 'required|valid_birthdate',
-		// ];
-		echo json_encode($this->validator->getErrors());
-		exit;
+		$errors = $this->validator->getErrors();
+		if($errors != array()){
+			return $this->fail($errors, 422);
+		}
+		$kapanganakan = \DateTime::createFromFormat('m/d/Y', $this->request->getVar('kapanganakan'));
+		$petsa_ng_pagrehistro = \DateTime::createFromFormat('m/d/Y', $this->request->getVar('petsa_ng_pagrehistro'));
 		$data = [
 			'first_name' => $this->request->getVar('first_name'),
 			'middle_name' => $this->request->getVar('middle_name'),
@@ -97,7 +104,7 @@ class Home extends BaseController
 			'kalye' => $this->request->getVar('kalye'),
 			'uri_ng_id' => $this->request->getVar('uri_ng_id'),
 			'numero_ng_id' => $this->request->getVar('numero_ng_id'),
-			'kapanganakan' => $this->request->getVar('kapanganakan'),
+			'kapanganakan' => $kapanganakan->format('Y-m-d'),
 			'trabaho' => $this->request->getVar('trabaho'),
 			'buwanang_kita' => $this->request->getVar('buwanang_kita'),
 			'pinagtratrabahuhang_lugar' => $this->request->getVar('pinagtratrabahuhang_lugar'),
@@ -109,13 +116,40 @@ class Home extends BaseController
 			'katutubo_name' => $this->request->getVar('katutubo_name'),
 			'bene_others' => $this->request->getVar('bene_others'),
 			'others_name' => $this->request->getVar('others_name'),
-			'petsa_ng_pagrehistro' => $this->request->getVar('petsa_ng_pagrehistro'),
+			'petsa_ng_pagrehistro' => $petsa_ng_pagrehistro->format('Y-m-d'),
 			'pangalan_ng_punong_barangay' => $this->request->getVar('pangalan_ng_punong_barangay'),
 			'pangalan_ng_lswdo' => $this->request->getVar('pangalan_ng_lswdo'),
 			'sac_number' => $this->request->getVar('sac_number'),
 		];
 		$household_head = new HouseholdHead();
-		$household_head->insert($data);
+		$this->db->transStart();
+		$household_head->save($data);
+		$household_id = $household_head->insertID();
+		if($this->request->getVar('members')){
+			$members = $this->request->getVar('members');
+			foreach ($members as $key => $member) {
+				$kapanganakan = \DateTime::createFromFormat('m/d/Y', $member['kapanganakan']);
+				$data = [
+					'household_head_id' => $household_id,
+					'first_name' => $member['first_name'],
+					'middle_name' => $member['middle_name'],
+					'last_name' => $member['last_name'],
+					'ext_name' => $member['ext_name'],
+					'relasyon_sa_punong_pamilya' => $member['relasyon_sa_punong_pamilya'],
+					'kasarian' => $member['kasarian'],
+					'kapanganakan' => $kapanganakan->format('Y-m-d'),
+					'trabaho' => $member['trabaho'],
+					'pinagtratrabahuhang_lugar' => $member['pinagtratrabahuhang_lugar'],
+					'sektor' => $member['sektor'],
+					'kondisyon_ng_kalusugan' => $member['kondisyon_ng_kalusugan'],
+				];
+				$household_members = new HouseholdMember();
+				$household_members->save($data);
+			}
+		}
+		$this->db->transComplete();
+		$household_head = new HouseholdHead();
+		return $this->respondCreated($household_head->find($household_id));
 	}
 	//--------------------------------------------------------------------
 
