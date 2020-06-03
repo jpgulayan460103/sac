@@ -10,13 +10,27 @@ class Home extends BaseController
 {
 	use ResponseTrait;
 	private $db;
+	private $session;
 	function __construct() {
-		$this->db = \Config\Database::connect();
+		$this->db      = \Config\Database::connect();
+		$this->session = \Config\Services::session();
 	}
 	
 	public function index()
 	{
+		if(!$this->session->user){
+			return redirect()->to('/login');
+		}
 		return view('form_test');
+	}
+
+	public function login()
+	{
+		return view('form_test');
+	}
+	public function logout()
+	{
+		$this->session->remove('user');
 	}
 
 	public function createBeneficiary()
@@ -246,6 +260,8 @@ class Home extends BaseController
 		if($user_query->first() != null){
 			$user = $user_query->first();
 			if(password_verify($password, $user->password)){
+				unset($user->password);
+				$this->session->set('user', $user);
 				$data = [
 					'status' => 'ok',
 					'message' => 'Successfully logged in.',
