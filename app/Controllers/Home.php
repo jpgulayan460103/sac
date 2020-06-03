@@ -4,6 +4,7 @@ use CodeIgniter\API\ResponseTrait;
 use App\Models\HouseholdHead;
 use App\Models\HouseholdMember;
 use App\Models\Barangay;
+use App\Models\User;
 
 class Home extends BaseController
 {
@@ -211,17 +212,56 @@ class Home extends BaseController
 		return $this->respond($data, 200);
 	}
 
-	/* 
-	Auth Code
-	$hashed = password_hash('rasmuslerdorf', PASSWORD_DEFAULT);
-	echo  $hashed;
-	if (password_verify('rasmuslerdorf', $hashed)) {
-		echo 'Password is valid!';
-	} else {
-		echo 'Invalid password.';
-	}
-	
-	*/
-	
 
+	public function createUser()
+	{
+		$rules = [
+            'username'  => 'required|allowed_string_name|min_length[6]|max_length[16]|is_unique[users.username]',
+            'full_name' => 'required|allowed_string_name|min_length[6]|max_length[16]',
+            'password'  => 'required|max_length[16]|min_length[6]',
+            'role'  => 'required',
+		];
+		$this->validate($rules);
+		$errors = $this->validator->getErrors();
+		if($errors != array()){
+			return $this->fail($errors, 422);
+		}
+		$user_model = new User();
+		$data = [
+			'username' => $this->request->getVar('username'),
+			'full_name' => $this->request->getVar('full_name'),
+			'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
+			'role' => $this->request->getVar('role'),
+		];
+		$user_model->save($data);
+	}
+
+	public function loginUser()
+	{
+		$username = $this->request->getVar('username');
+		$password = $this->request->getVar('password');
+		$user_model = new User();
+		$user_query = $user_model;
+		$user_query->where('username',$username);
+		if($user_query->first() != null){
+			$user = $user_query->first();
+			if(password_verify($password, $user->password)){
+				$data = [
+					'status' => 'ok',
+					'message' => 'Successfully logged in.',
+				];
+			}else{
+				$data = [
+					'status' => 'error',
+					'message' => 'Invalid credentials.',
+				];
+			}
+		}else{
+			$data = [
+				'status' => 'error',
+				'message' => 'Invalid credentials.',
+			];
+		}
+		return $this->respond($data, 200);
+	}
 }

@@ -32,6 +32,8 @@ $routes->setAutoRoute(true);
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 $routes->post('/create', 'Home::createBeneficiary');
+$routes->post('/users/create', 'Home::createUser');
+$routes->post('/users/login', 'Home::loginUser');
 $routes->get('/beneficiaries/encoded/(:segment)', 'Home::listBeneficiaries');
 $routes->post('/beneficiaries/encoded', 'Home::listBeneficiaries');
 $routes->get('/provinces', 'Home::listProvinces');
