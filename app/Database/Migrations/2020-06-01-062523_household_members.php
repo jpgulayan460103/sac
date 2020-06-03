@@ -46,6 +46,7 @@ class HouseholdMembers extends Migration
 			'kasarian' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 100,
+				'null'           => TRUE,
 			],
 			'kapanganakan' => [
 				'type'           => 'DATE',
@@ -60,16 +61,19 @@ class HouseholdMembers extends Migration
 			'pinagtratrabahuhang_lugar' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 200,
+				'null'           => TRUE,
 				'default'        => '-',
 			],
 			'sektor' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 200,
+				'null'           => TRUE,
 				'default'        => 'W - Wala sa pagpipilian',
 			],
 			'kondisyon_ng_kalusugan' => [
 				'type'           => 'VARCHAR',
 				'constraint'     => 200,
+				'null'           => TRUE,
 				'default'        => '0 - Wala sa pagpipilian',
 			],
 			'created_at' => [

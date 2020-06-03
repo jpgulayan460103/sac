@@ -129,20 +129,20 @@ class Home extends BaseController
 		if($this->request->getVar('members')){
 			$members = $this->request->getVar('members');
 			foreach ($members as $key => $member) {
-				$kapanganakan = \DateTime::createFromFormat('m/d/Y', $member['kapanganakan']);
+				$kapanganakan = \DateTime::createFromFormat('m/d/Y', $this->request->getVar("members[$key][kapanganakan]"));
 				$data = [
 					'household_head_id' => $household_id,
-					'first_name' => $member['first_name'],
-					'middle_name' => $member['middle_name'],
-					'last_name' => $member['last_name'],
-					'ext_name' => $member['ext_name'],
-					'relasyon_sa_punong_pamilya' => $member['relasyon_sa_punong_pamilya'],
-					'kasarian' => $member['kasarian'],
+					'first_name' => $this->request->getVar("members[$key][first_name]"),
+					'middle_name' => $this->request->getVar("members[$key][middle_name]"),
+					'last_name' => $this->request->getVar("members[$key][last_name]"),
+					'ext_name' => $this->request->getVar("members[$key][ext_name]"),
+					'relasyon_sa_punong_pamilya' => $this->request->getVar("members[$key][relasyon_sa_punong_pamilya]"),
+					'kasarian' => $this->request->getVar("members[$key][kasarian]"),
 					'kapanganakan' => $kapanganakan->format('Y-m-d'),
-					'trabaho' => $member['trabaho'],
-					'pinagtratrabahuhang_lugar' => $member['pinagtratrabahuhang_lugar'],
-					'sektor' => $member['sektor'],
-					'kondisyon_ng_kalusugan' => $member['kondisyon_ng_kalusugan'],
+					'trabaho' => $this->request->getVar("members[$key][trabaho]"),
+					'pinagtratrabahuhang_lugar' => $this->request->getVar("members[$key][pinagtratrabahuhang_lugar]"),
+					'sektor' => $this->request->getVar("members[$key][sektor]"),
+					'kondisyon_ng_kalusugan' => $this->request->getVar("members[$key][kondisyon_ng_kalusugan]"),
 				];
 				$household_members = new HouseholdMember();
 				$household_members->save($data);
